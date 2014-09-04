@@ -35,6 +35,7 @@
             this.placement = config.placement;
             this.offsetTop = config.offsetTop;
             this.offsetLeft = config.offsetLeft;
+            this.arrowPosition = config.arrowPosition;
             this.scroll = config.scroll;
             this.staticClass = 'ng-joyride-element-static';
             this.nonStaticClass = 'ng-joyride-element-non-static';
@@ -73,6 +74,22 @@
                       currentLeft = currentLeft.slice(0, currentLeft.length - 2);
                       var newLeft = parseInt(currentLeft - self.offsetLeft);
                       $('body').find('.popover').css({left: newLeft+'px', visibility: 'visible'});
+                    }
+                    if(self.arrowPosition) {
+                      switch(self.arrowPosition) {
+                        case 'top':
+                          $('body').find('.arrow').css('top', '10%');
+                          break;
+                        case 'left':
+                          $('body').find('.arrow').css('left', '10%');
+                          break;
+                        case 'bottom':
+                          $('body').find('.arrow').css('bottom', '10%');
+                          break;
+                        case 'right':
+                          $('body').find('.arrow').css('right', '10%');
+                          break;
+                      }
                     }
                     $timeout(function () {
                         $('body').find('.ng-joyride').css('visibility', 'visible');
