@@ -1,0 +1,100 @@
+$joyride-highlight: $white;
+
+#ng-curtain {
+  position: fixed;
+  background: $gray;
+  opacity: 0.5;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  z-index: 9998;
+  display: none;
+
+  &.curtain-transparent {
+    background: transparent;
+  }
+  &.curtain-frosted {
+    background: $gray-lightest;
+  }
+}
+
+.ng-joyride {
+  visibility: hidden;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  .buttons {
+    @extend .pull-left;
+  }
+  button {
+    border-color: $gray;
+    font-family: $font-family-sans-serif;
+    border-radius: 0px;
+  }
+  .row {
+    margin-top: 20px;
+  }
+}
+
+.ng-joyride-title {
+  z-index: 9999;
+  @extend .absolute-center;
+  text-align: left;
+  width:200px;
+  background: $gray-dark;
+  width: 35em;
+  color: $faint-gray;
+}
+
+.ng-joyride-element-non-static {
+  z-index: 9999;
+}
+
+.ng-joyride-element-static {
+  position: relative;
+  z-index: 9999;
+  background: $joyride-highlight
+}
+
+.ng-joyride.popover {
+  z-index: 9999;
+  background: $gray-dark;
+  color: $faint-gray;
+  &.top > .arrow:after {
+    border-top-color: $gray-dark;
+  }
+  button:first-of-type {
+   margin-left: 4px;
+  }
+}
+
+#pop-over-text {
+  padding: 0 14px 9px;
+}
+
+.ng-joyride .popover-title {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: $font-size-base;
+  line-height: $margin-smaller; // 20px
+  color: $brand-primary;
+  margin: $margin-smallest 0 0;
+  padding: 0 14px;
+  text-align: left;
+}
+.ng-joyride-modal.modal {
+    z-index:9999 !important;
+}
+
+.ng-joyride {
+  [disabled].btn, button[disabled] {
+    visibility: hidden;
+  }
+}
+
+// Specific element overrides for when backgrounds are not set correctly
+#favorites_tab.ng-joyride-element-non-static {
+  background: $joyride-highlight;
+}

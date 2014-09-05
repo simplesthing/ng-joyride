@@ -21,7 +21,7 @@
             '<div class=\"popover ng-joyride\"><div class=\"arrow\"></div><h3 class=\"popover-title\"></h3><div class=\"popover-content container-fluid\"></div></div>'
         );
         $templateCache.put('ng-joyride-title-tplv1.html',
-            '<div class=\"ng-joyride \" style=\"\"><div class=\"popover-inner\"><h3 class=\"popover-title\">{{heading}}</h3><div class=\"popover-content container-fluid\"><div class\"row\"><div ng-bind-html=\"content\"></div></div><div class=\"row\"><div class=\"col-md-4\"></div><div class=\"col-md-8 buttons \"><button id=\"nextTitleBtn\" class=\"nextBtn btn btn-primary pull-right\" type=\"button\">OKAY</button><button disabled=\"disabled\" class=\"prevBtn btn pull-right\" type=\"button\">BACK</button></div></div></div></div></div>'
+            '<div class=\"ng-joyride \" style=\"\"><div class=\"popover-inner\"><h3 class=\"popover-title\">{{heading}}</h3><div class=\"popover-content container-fluid\"><div class\"row\"><div ng-bind-html=\"content\"></div></div><div class=\"row\"><div class=\"col-md-4 skip-class\"><button id=\"skipBtn\" class=\"skipBtn btn btn-primary pull-left\" type=\"button\">SKIP</button></div><div class=\"col-md-8 buttons \"><button id=\"nextTitleBtn\" class=\"nextBtn btn btn-primary pull-right\" type=\"button\">OKAY</button><button disabled=\"disabled\" class=\"prevBtn btn pull-right\" type=\"button\">BACK</button></div></div></div></div></div>'
         );
     }]);
     drctv.factory('joyrideElement', ['$timeout', '$compile', '$sce', function ($timeout, $compile, $sce) {
@@ -30,7 +30,7 @@
             this.content = $sce.trustAsHtml(config.text);
             this.selector = config.selector;
             this.template = template || 'ng-joyride-tplv1.html';
-            this.popoverTemplate = '<div class=\"row\"><div id=\"pop-over-text\" class=\"col-md-12\">' + this.content + '</div></div><div class=\"row\"><div class=\"col-md-4 center\"></div><div class=\"col-md-8 buttons\"><button id=\"nextBtn\" class=\"nextBtn btn btn-xs btn-primary pull-right\" type=\"button\">'+ _generateTextForNext() +'</button><button id=\"prevBtn\" class=\"prevBtn btn btn-xs pull-right\" type=\"button\">BACK</button></div></div>';
+            this.popoverTemplate = '<div class=\"row\"><div id=\"pop-over-text\" class=\"col-md-12\">' + this.content + '</div></div><div class=\"row\"><div class=\"col-md-4 skip-class\"><button id=\"skipBtn\" class=\"skipBtn btn btn-primary pull-left btn-xs\" type=\"button\">SKIP</button></div><div class=\"col-md-8 buttons\"><button id=\"nextBtn\" class=\"nextBtn btn btn-xs btn-primary pull-right\" type=\"button\">'+ _generateTextForNext() +'</button><button id=\"prevBtn\" class=\"prevBtn btn btn-xs pull-right\" type=\"button\">BACK</button></div></div>';
             this.heading = config.heading;
             this.placement = config.placement;
             this.offsetTop = config.offsetTop;
@@ -265,7 +265,7 @@
             }
 
             function cleanUp() {
-                $fkEl.slideUp(100, function () {
+                $fkEl.fadeOut(100, function () {
                     $fkEl.remove();
                 });
             }
@@ -431,7 +431,6 @@
                 }
 
                 function skipDemo() {
-
                     endJoyride();
                     scope.onSkip();
                 }
@@ -443,18 +442,19 @@
                         if ($fkEl.size() === 0) {
                             $('body').append('<div id=\"ng-curtain\"></div>');
                             $fkEl = $('#ng-curtain');
-                            // $fkEl.slideDown(1000);
                             $fkEl.fadeIn(1000);
                             $fkEl.animate({opacity: 0.5}, 400, '');
                         } else {
-
                             $fkEl.animate({opacity: 0.5}, 400, '');
                         }
+                        // $fkEl.on('click', function (){
+                        //    endJoyride();
+                        // });
                     } else {
-                        $fkEl.slideUp(100, function () {
+                        $fkEl.fadeOut(100, function () {
                             $fkEl.remove();
                         });
-
+                        // $fkEl.off('click');
                     }
 
                 }
@@ -484,7 +484,6 @@
                     if(currentStepCount!==0){
                         steps[currentStepCount-1].cleanUp();
                     }
-
                 }
 
                 function generateStep() {
@@ -498,20 +497,20 @@
                         }, interval);
 
                     } else if (currentStep.type === 'function') {
+
                         $timeout(function () {
                             goToNext();
                         }, interval*2);
 
                     }
                 }
+
                 function changeCurtainClass(className){
                     $fkEl.removeClass();
                     if(className){
                         $fkEl.addClass(className);
                     }
-
                 }
-
 
                 function initializeJoyride() {
                   var count = -1;
