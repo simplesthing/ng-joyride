@@ -21,7 +21,7 @@
             '<div class=\"popover ng-joyride\"><div class=\"arrow\"></div><h3 class=\"popover-title\"></h3><div class=\"popover-content container-fluid\"></div></div>'
         );
         $templateCache.put('ng-joyride-title-tplv1.html',
-            '<div class=\"ng-joyride \" style=\"\"><div class=\"popover-inner\"><h3 class=\"popover-title\">{{heading}}</h3><div class=\"popover-content container-fluid\"><div class\"row\"><div ng-bind-html=\"content\"></div></div><div class=\"row\"><div class=\"col-md-4 skip-class\"><button id=\"skipBtn\" class=\"skipBtn btn btn-primary pull-left\" type=\"button\">SKIP</button></div><div class=\"col-md-8 buttons \"><button id=\"nextTitleBtn\" class=\"nextBtn btn btn-primary pull-right\" type=\"button\">OKAY</button><button disabled=\"disabled\" class=\"prevBtn btn pull-right\" type=\"button\">BACK</button></div></div></div></div></div>'
+            '<div class=\"ng-joyride \" style=\"\"><div class=\"popover-inner\"><h3 class=\"popover-title\">{{heading}}</h3><div class=\"popover-content container-fluid\"><div class\"row\"><div ng-bind-html=\"content\"></div></div><div class=\"row\"><div class=\"col-md-4 skip-class\"><button id=\"skipBtn\" class=\"skipBtn btn btn-primary pull-left\" type=\"button\">SKIP</button></div><div class=\"col-md-8 buttons \"><button id=\"nextTitleBtn\" class=\"nextBtn btn btn-primary pull-right\" type=\"button\">OKAY</button><button class=\"prevBtn btn pull-right\" type=\"button\">BACK</button></div></div></div></div></div>'
         );
     }]);
     drctv.factory('joyrideElement', ['$timeout', '$compile', '$sce', function ($timeout, $compile, $sce) {
@@ -64,16 +64,25 @@
                 $timeout(function () {
                     $fkEl.popover('show');
                     if(self.offsetTop) {
-                      var currentTop = $('body').find('.popover').css('top');
-                      currentTop = currentTop.slice(0, currentTop.length - 2);
-                      var newTop = parseInt(currentTop) - self.offsetTop;
-                      $('body').find('.popover').css({top: newTop+'px', visibility: 'visible'});
+                      if(typeof self.offsetTop === 'string') {
+                        $('body').find('.popover').css({top: self.offsetTop, visibility: 'visible'});
+                      } else {
+                        var currentTop = $('body').find('.popover').css('top');
+                        currentTop = currentTop.slice(0, currentTop.length - 2);
+                        var newTop = parseInt(currentTop) - self.offsetTop;
+                        $('body').find('.popover').css({top: newTop+'px', visibility: 'visible'});
+                      }
                     }
                     if(self.offsetLeft) {
-                      var currentLeft = $('body').find('.popover').css('left');
-                      currentLeft = currentLeft.slice(0, currentLeft.length - 2);
-                      var newLeft = parseInt(currentLeft - self.offsetLeft);
-                      $('body').find('.popover').css({left: newLeft+'px', visibility: 'visible'});
+                      if(typeof self.offsetLeft === 'string') {
+                        $('body').find('.popover').css({left: self.offsetLeft, visibility: 'visible'});
+                      } else {
+                        var currentLeft = $('body').find('.popover').css('left');
+                        currentLeft = currentLeft.slice(0, currentLeft.length - 2);
+                        var newLeft = parseInt(currentLeft - self.offsetLeft);
+                        $('body').find('.popover').css({left: newLeft+'px', visibility: 'visible'});
+                      }
+
                     }
                     if(self.arrowPosition) {
                       switch(self.arrowPosition) {
@@ -90,6 +99,9 @@
                           $('body').find('.arrow').css('right', '10%');
                           break;
                       }
+                    }
+                    if(self.currentStep === 0) {
+                      $('.prevBtn').attr('disabled', 'disabled');
                     }
                     $timeout(function () {
                         $('body').find('.ng-joyride').css('visibility', 'visible');
@@ -163,18 +175,21 @@
             }
 
             function _unhighlightElement() {
+              // remove these if's catch this error higher up the call stack
+              if($fkEl && $fkEl.hasClass(this.staticClass)) {
                 $fkEl.removeClass(this.staticClass);
+              }
+              if($fkEl && $fkEl.hasClass(this.nonStaticClass)) {
                 $fkEl.removeClass(this.nonStaticClass);
-
-
+              }
             }
 
             function cleanUp() {
+              if($fkEl) {
                 _unhighlightElement.call(this);
                 $fkEl.off('click',stopEvent);
                 $($fkEl).popover('destroy');
-
-
+              }
             }
 
             return {
@@ -234,13 +249,16 @@
                 }
                 $timeout(function (){
                   $fkEl.append(compiled);
+                  if(self.currentStep === 0) {
+                    $('.prevBtn').attr('disabled', 'disabled');
+                  }
                   $('body').find('.ng-joyride').css('visibility', 'visible');
-                    $('.nextBtn').one('click',self.goToNextFn);
-                    $('.skipBtn').one('click',self.skipDemoFn);
-                    $('.prevBtn').one('click',self.goToPrevFn);
-                    if (this.scroll) {
-                      _scrollToElement.call(this,this.titleTemplateIdSelector);
-                    }
+                  $('.nextBtn').one('click',self.goToNextFn);
+                  $('.skipBtn').one('click',self.skipDemoFn);
+                  $('.prevBtn').one('click',self.goToPrevFn);
+                  if (this.scroll) {
+                    _scrollToElement.call(this,this.titleTemplateIdSelector);
+                  }
                 }, 250);
 
             }
@@ -265,9 +283,11 @@
             }
 
             function cleanUp() {
+              if($fkEl) {
                 $fkEl.fadeOut(100, function () {
                     $fkEl.remove();
                 });
+              }
             }
 
             return {
@@ -364,7 +384,8 @@
 
     }]);
 
-    drctv.directive('ngJoyRide', ['$http', '$timeout', '$location', '$window', '$templateCache', '$http', '$q' , '$compile', '$sce', 'joyrideFn', 'joyrideTitle', 'joyrideElement', 'joyrideLocationChange', function ($http, $timeout, $location, $window, $templateCache, $http, $q, $compile, $sce, joyrideFn, joyrideTitle, joyrideElement, joyrideLocationChange) {
+    drctv.directive('ngJoyRide', ['$http', '$timeout', '$location', '$window', '$templateCache', '$http', '$q' , '$compile', '$sce', 'joyrideFn', 'joyrideTitle', 'joyrideElement', 'joyrideLocationChange',
+      function ($http, $timeout, $location, $window, $templateCache, $http, $q, $compile, $sce, joyrideFn, joyrideTitle, joyrideElement, joyrideLocationChange) {
         return {
             restrict: 'A',
             scope: {
@@ -430,9 +451,10 @@
 
                 }
 
-                function skipDemo() {
-                    endJoyride();
-                    scope.onSkip();
+                function skipDemo(e) {
+                  e.preventDefault();
+                  endJoyride();
+                  scope.onSkip();
                 }
 
                 function dropCurtain(shouldDrop) {
@@ -466,19 +488,24 @@
                         currentStepCount = 0;
                         dropCurtain(true);
                         cleanUpPreviousStep();
-                        generateStep();
+                       $timeout(function (){
+                         generateStep();
+                       },100);
                     }
                 });
 
-                scope.$watchCollection('config.length', function (newVal, oldVal){
+                scope.$watchCollection('config', function (newval, oldval){
                   initializeJoyride();
                 });
 
                 function destroyJoyride(){
+                  if(steps) {
                     steps.forEach(function(elem){
+                      elem
                         elem.cleanUp();
                     });
                     dropCurtain(false);
+                  }
                 }
                 function cleanUpPreviousStep() {
                     if(currentStepCount!==0){
